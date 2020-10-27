@@ -9,14 +9,19 @@ namespace testJuryNumberProject
     {
         private char Cords { get; set; }
         private double Delta { get; set; }
+        private double MinValue { get; set; }
         private string Data { get; set; }
         NumberPrinter Printer { get; set; }
-        public ValueFinder(char cordsToFind, double delta, string dataToProcess, NumberPrinter printer)
+        private bool IsUncheckedCoordinate { get; set; } = false;
+        public ValueFinder(char cordsToFind, double delta, string dataToProcess, NumberPrinter printer, double minValue)
         {
             Cords = cordsToFind;
             Delta = delta;
             Data = dataToProcess;
             Printer = printer;
+            MinValue = minValue;
+            if (Cords == 'Z')
+                IsUncheckedCoordinate = true;
         }
 
         public string Process()
@@ -53,7 +58,8 @@ namespace testJuryNumberProject
         private double GetSummaryValue(string v)
         {
             double value = double.Parse(v, NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
-            value += Delta;
+            if (value >= MinValue || IsUncheckedCoordinate)
+                value += Delta;
             return value;
         }
     }

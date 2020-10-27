@@ -12,9 +12,6 @@ namespace testJuryNumberProject
     {
         static void Main(string[] args)
         {
-
-
-
             //// ГОТОВАЯ ПРОГРАММА
             /*
             if (args.Length != 5)
@@ -54,14 +51,14 @@ namespace testJuryNumberProject
             string FileContent = "G0 X500.2365 Y300.12354 Z-50.25648 F2500";
             var printer = new NumberPrinter(true, 2);
             string result = FileContent;
-            result = StrategyForCoordinateStart('X', result, -100, printer);
-            result = StrategyForCoordinateStart('Y', result, 100, printer);
-            result = StrategyForCoordinateStart('Z', result, 0, printer);
+            result = StrategyForCoordinateStart('X', result, -100, printer, 500);
+            result = StrategyForCoordinateStart('Y', result, 100, printer, 400);
+            result = StrategyForCoordinateStart('Z', result, 0, printer, 0);
             Console.WriteLine(result);
         }
-        static string StrategyForCoordinateStart(char cords, string data, double delta, NumberPrinter printer)
+        static string StrategyForCoordinateStart(char cords, string data, double delta, NumberPrinter printer, double minValue)
         {
-            var parser = new ValueFinder(cords, delta, data, printer);
+            var parser = new ValueFinder(cords, delta, data, printer, minValue);
             return parser.Process();
         }
     }
