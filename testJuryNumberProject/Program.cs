@@ -48,7 +48,9 @@ namespace testJuryNumberProject
 
             Console.WriteLine(result);*/
             ///ТЕСТОВАЯ ПРОГРАММА
-            string FileContent = "G0 X500.2365 Y300.12354 Z-50.25648 F2500";
+            string FileContent = @"X500.2365
+G0 X500.2365 Y300.12354 Z-50.25648 F2500 G0 X500.2365 Y300.12354 Z-50.25648
+G0 X500.2365 Y300.12354 Z-50.25648 F2500";
             var printer = new NumberPrinter(true, 2);
             string result = FileContent;
             result = StrategyForCoordinateStart('X', result, -100, printer, 500);

@@ -35,7 +35,7 @@ namespace testJuryNumberProject
             {
                 if (stateCollectNumber)
                 {
-                    if (!char.IsWhiteSpace(letter))
+                    if (!char.IsWhiteSpace(letter) && !Environment.NewLine.Contains(letter))
                         collectedValue.Append(letter);
                     else
                     {
@@ -43,6 +43,7 @@ namespace testJuryNumberProject
                         var currentValue = Printer.Print(GetSummaryValue(collectedValue.ToString()));
                         result.Append(currentValue);
                         result.Append(letter);
+                        collectedValue = new StringBuilder();
                     }
                 }
                 else
