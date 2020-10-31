@@ -47,10 +47,9 @@ namespace GUIProgram.ViewModels
             XCoordinate = new CoordinateModel('X');
             YCoordinate = new CoordinateModel('Y');
             ZCoordinate = new CoordinateModel('Z');
+            CoordinateModel.SetLogger(Log);
             SourceFileName = "Файл не выбран";
             PrinterSettings = new PrinterSettings();
-            worker.DoWork += worker_DoWork;
-            worker.RunWorkerCompleted += worker_RunWorkerCompleted;
             isFileSelected = false;
         }
         bool isFileSelected;
@@ -83,23 +82,66 @@ namespace GUIProgram.ViewModels
             {
                 Log("Обработка координаты X");
                 Thread.Sleep(1500);
-                data = XCoordinate.Process(data, printer, Log);
+                data = XCoordinate.Process(data, printer);
             }
             Step = 1;
             if (YCoordinate.IsSelected)
             {
                 Log("Обработка координаты Y");
                 Thread.Sleep(1500);
-                data = YCoordinate.Process(data, printer, Log);
+                data = YCoordinate.Process(data, printer);
             }
             Step = 2;
             if (ZCoordinate.IsSelected)
             {
                 Log("Обработка координаты Z");
                 Thread.Sleep(1500);
-                data = ZCoordinate.Process(data, printer, Log);
+                data = ZCoordinate.Process(data, printer);
             }
             Step = 3;
+            if (DialogService.SaveFileDialog())
+            {
+                Log($"Запись результата в {DialogService.FilePath}");
+                File.WriteAllText(DialogService.FilePath, data);
+            }
+            else
+                Log($"Файл не выбран, запись не произведена!");
+            Log($"Работа завершена");
+        }
+        private void DoArrayWork()
+        {
+            LogInfo = string.Empty;
+            Step = 0;
+            Log("Начало обработки файла.");
+            var printer = PrinterSettings.GeneratePrinter(Log);
+            string data = File.ReadAllText(SourceFileName);
+            if (XCoordinate.IsSelected)
+            {
+                Log("Обработка координаты X");
+                Thread.Sleep(1500);
+                data = XCoordinate.ProcessWithArray(data, printer);
+            }
+            Step = 1;
+            if (YCoordinate.IsSelected)
+            {
+                Log("Обработка координаты Y");
+                Thread.Sleep(1500);
+                data = YCoordinate.ProcessWithArray(data, printer);
+            }
+            Step = 2;
+            if (ZCoordinate.IsSelected)
+            {
+                Log("Обработка координаты Z");
+                Thread.Sleep(1500);
+                data = ZCoordinate.ProcessWithArray(data, printer);
+            }
+            Step = 3;
+            if (XCoordinate.IsSelected)
+                data = XCoordinate.InitArrayProcessLogic(data,printer);
+            if (YCoordinate.IsSelected)
+                data = YCoordinate.InitArrayProcessLogic(data, printer);
+            if (ZCoordinate.IsSelected)
+                data = ZCoordinate.InitArrayProcessLogic(data, printer);
             if (DialogService.SaveFileDialog())
             {
                 Log($"Запись результата в {DialogService.FilePath}");
@@ -119,6 +161,10 @@ namespace GUIProgram.ViewModels
         {
             DoWork();
         }
+        private void worker_DoArrayWork(object sender, DoWorkEventArgs e)
+        {
+            DoArrayWork();
+        }
         #endregion
         #region Commands
         private ICommand _command;
@@ -129,6 +175,7 @@ namespace GUIProgram.ViewModels
                 this._command = new RelayCommand(
                     (object param) =>
                     {
+                        worker.DoWork += worker_DoWork;
                         worker.RunWorkerAsync();
                     }, (object param) => { return IsModelValid;  }
                     );
@@ -139,7 +186,24 @@ namespace GUIProgram.ViewModels
                 this._command = value;
             }
         }
-
+        public ICommand ArrayCommand
+        {
+            get
+            {
+                this._command = new RelayCommand(
+                    (object param) =>
+                    {
+                        worker.DoWork += worker_DoArrayWork;
+                        worker.RunWorkerAsync();
+                    }, (object param) => { return IsModelValid; }
+                    );
+                return this._command;
+            }
+            set
+            {
+                this._command = value;
+            }
+        }
         public ICommand PickFileCommand
         {
             get

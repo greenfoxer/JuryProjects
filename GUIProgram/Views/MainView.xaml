@@ -91,19 +91,10 @@
                 </StackPanel>
             </GroupBox>
             <GroupBox Grid.Row="2" Header="Координата Z" Margin="5,0,5,0">
-                <StackPanel HorizontalAlignment="Center" Margin="5" Orientation="Horizontal">
+                <StackPanel HorizontalAlignment="Left" Margin="5" Orientation="Horizontal">
                     <CheckBox VerticalAlignment="Center" Margin="10" IsChecked="{Binding ZCoordinate.IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></CheckBox>
                     <Label Margin="10" MinWidth="20" Content="{Binding ZCoordinate.Litera, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></Label>
-                    <Label Margin="0,10,0,10" MinWidth="20" Content="Минимальное значение:"></Label>
-                    <TextBox Margin="0,10,10,10" MinWidth="70">
-                        <TextBox.Text>
-                            <Binding Path="ZCoordinate.DisplayMinimumValue" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
-                                <Binding.ValidationRules>
-                                    <DataErrorValidationRule/>
-                                </Binding.ValidationRules>
-                            </Binding>
-                        </TextBox.Text>
-                    </TextBox>
+                    
                     <Label Margin="0,10,0,10" MinWidth="20" Content="Дельта:"></Label>
                     <TextBox Margin="0,10,10,10" MinWidth="70">
                         <TextBox.Text>
@@ -133,7 +124,12 @@
                 </StackPanel>
             </GroupBox>
             <Grid Grid.Row="4" Margin="15">
-                <Button MinHeight="25" Command="{Binding Path=TestCommand}">Старт обработки файла</Button>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" MinHeight="25" Margin="0,0,5,0" Command="{Binding Path=TestCommand}">Простая обработка</Button>
+                <Button Grid.Column="1" MinHeight="25" Margin="5,0,0,0" Command="{Binding Path=ArrayCommand}">Обработка массивом</Button>
             </Grid>
             <Grid>
             </Grid>

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace AlgorithmLib
 {
-    public class ValueFinder : IAlgorithm
+    public class CollectingFinder : IAlgorithm
     {
         private char Cords { get; set; }
         private double Delta { get; set; }
@@ -14,7 +14,7 @@ namespace AlgorithmLib
         private string Data { get; set; }
         NumberPrinter Printer { get; set; }
         private bool IsUncheckedCoordinate { get; set; } = false;
-        public ValueFinder(char cordsToFind, double delta, NumberPrinter printer, double minValue, LoggingDelegate loggingDelegate = null)
+        public CollectingFinder(char cordsToFind, double delta, NumberPrinter printer, double minValue, LoggingDelegate loggingDelegate = null)
         {
             Cords = cordsToFind;
             Delta = delta;
@@ -30,9 +30,13 @@ namespace AlgorithmLib
             if (Logger != null)
                 Logger("ValueFinder", new AlgorithmLibEventArgs(state, message));
         }
+        Dictionary<string, double> StubValueDictionary;
+        int Counter;
         public string Process(string dataToProcess)
         {
             Data = dataToProcess;
+            StubValueDictionary = new Dictionary<string, double>();
+            Counter = 0;
             StringBuilder result = new StringBuilder();
 
             bool stateCollectNumber = false;
@@ -48,10 +52,12 @@ namespace AlgorithmLib
                         else
                         {
                             stateCollectNumber = false;
-                            var currentValue = Printer.Print(GetSummaryValue(collectedValue.ToString()));
-                            result.Append(currentValue);
+                            string stub = $"{{{Cords}{Counter++}}}";
+                            double value = double.Parse(collectedValue.ToString(), NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+                            StubValueDictionary.Add(stub, value);
+                            result.Append(stub);
                             result.Append(letter);
-                            Log( $"{Cords}{collectedValue.ToString()} -> {Cords}{currentValue}");
+                            Log($"{stub} -> {value}");
                             collectedValue.Clear();
                         }
                     }
@@ -64,19 +70,31 @@ namespace AlgorithmLib
             }
             catch (Exception e)
             {
-                Log( $"{e.Message}", LoggerState.Error);
+                Log($"{e.Message}", LoggerState.Error);
                 return Data;
             }
 
             return result.ToString();
         }
-
-        private double GetSummaryValue(string v)
+        public void DoTransform()
         {
-            double value = double.Parse(v, NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+            var output = new Dictionary<string, double>();
+            foreach (string key in StubValueDictionary.Keys)
+            {
+                output.Add(key,GetSummaryValue(key));
+            }
+            StubValueDictionary = output;
+        }
+        private double GetSummaryValue(string key)
+        {
+            double value = StubValueDictionary[key];
             if (value >= MinValue || IsUncheckedCoordinate)
                 value += Delta;
             return value;
+        }
+        public Dictionary<string, double> GetCoordinateArray()
+        {
+            return StubValueDictionary;
         }
     }
 }

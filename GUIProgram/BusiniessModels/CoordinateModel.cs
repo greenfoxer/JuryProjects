@@ -27,12 +27,37 @@ namespace GUIProgram.BusiniessModels
             DisplayMinimumValue = MinimumValue.ToString();
             DisplayDelta = Delta.ToString();
         }
-        public string Process(string data, NumberPrinter printer, LoggingDelegate loggingDelegate = null)
+        static LoggingDelegate LoggingDelegate;
+        public static void SetLogger(LoggingDelegate loggingDelegate = null)
+        {
+            LoggingDelegate = loggingDelegate;
+        }
+        IAlgorithm _parser;
+        public string Process(string data, NumberPrinter printer)
         {
             Delta = double.Parse(DisplayDelta, NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
             MinimumValue = double.Parse(DisplayMinimumValue, NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
-            var parser = new ValueFinder(Litera, Delta, data, printer, MinimumValue, loggingDelegate);
-            return parser.Process();
+            _parser = new ValueFinder(Litera, Delta, printer, MinimumValue, LoggingDelegate);
+            return _parser.Process(data);
+        }
+        Dictionary<string, double> StubValueDictionary;
+        public string ProcessWithArray(string data, NumberPrinter printer)
+        {
+            Delta = double.Parse(DisplayDelta, NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+            MinimumValue = double.Parse(DisplayMinimumValue, NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+            _parser = new CollectingFinder(Litera, Delta, printer, MinimumValue, LoggingDelegate);
+            return _parser.Process(data);
+        }
+        public string InitArrayProcessLogic(string data, NumberPrinter printer)
+        {
+            var _currentParser = (_parser as CollectingFinder);
+            _currentParser.DoTransform();
+            StubValueDictionary = _currentParser.GetCoordinateArray();
+            foreach (string key in StubValueDictionary.Keys)
+            {
+                data = data.Replace(key, printer.Print(StubValueDictionary[key]) );
+            }
+            return data;
         }
     }
 }
