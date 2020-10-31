@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AlgorithmLib;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -51,10 +52,12 @@ namespace testJuryNumberProject
             string FileContent = @"X500.2365
 G0 X500.2365 Y300.12354 Z-50.25648 F2500 G0 X500.2365 Y300.12354 Z-50.25648
 G0 X500.2365 Y300.12354 Z-50.25648 F2500";
+            FileContent = "G0 X500.2365Y300.12354Z-50.25648 F2500 G0 X500.2365Y300.12354Z-50.25648";
+            FileContent = File.ReadAllText(@"c:\work\samples\jury\WINNER IJK.anc");
             var printer = new NumberPrinter(true, 2);
             string result = FileContent;
-            result = StrategyForCoordinateStart('X', result, -100, printer, 500);
-            result = StrategyForCoordinateStart('Y', result, 100, printer, 400);
+            result = StrategyForCoordinateStart('X', result, -100, printer, 0);
+            result = StrategyForCoordinateStart('Y', result, 100, printer, 0);
             result = StrategyForCoordinateStart('Z', result, 0, printer, 0);
             Console.WriteLine(result);
         }
